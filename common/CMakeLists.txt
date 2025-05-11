@@ -15,6 +15,13 @@ function(write_revision_h)
                 OUTPUT_VARIABLE GIT_TAG
                 OUTPUT_STRIP_TRAILING_WHITESPACE
                 ERROR_QUIET)
+        # To support being on a commit with mutiple tags
+        if(${GIT_TAG} MATCHES "\n")
+          string(REPLACE "\n" ";" GIT_TAG_LIST "${GIT_TAG}")
+          list(LENGTH GIT_TAG_LIST GIT_TAG_LIST_LENGTH)
+          math(EXPR GIT_TAG_LAST_INDEX "${GIT_TAG_LIST_LENGTH} - 1")
+          list(GET GIT_TAG_LIST ${GIT_TAG_LAST_INDEX} GIT_TAG)
+        endif()
     endif()
     string(REPLACE "\n" "" GIT_TAG "${GIT_TAG}")
 string(REPLACE "\r" "" GIT_TAG "${GIT_TAG}")
@@ -55,7 +62,7 @@ add_library(common
         repl/config.cpp
         repl/nrepl/ReplClient.cpp
         repl/nrepl/ReplServer.cpp
-        repl/util.cpp
+        repl/repl_wrapper.cpp
         serialization/subtitles/subtitles_v1.cpp
         serialization/subtitles/subtitles_v2.cpp
         serialization/subtitles/subtitles.cpp
@@ -92,6 +99,7 @@ add_library(common
         util/Timer.cpp
         util/unicode_util.cpp
         util/gltf_util.cpp
+        util/image_resize.cpp
         versions/versions.cpp
         )
 
